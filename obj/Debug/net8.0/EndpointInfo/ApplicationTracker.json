@@ -5,41 +5,33 @@
     "version": "1.0"
   },
   "paths": {
-    "/WeatherForecast": {
-      "get": {
+    "/api/Application": {
+      "post": {
         "tags": [
-          "WeatherForecast"
+          "Application"
         ],
-        "operationId": "GetWeatherForecast",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationModel"
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -47,23 +39,27 @@
   },
   "components": {
     "schemas": {
-      "WeatherForecast": {
+      "ApplicationModel": {
+        "required": [
+          "companyName",
+          "dateApplied",
+          "status"
+        ],
         "type": "object",
         "properties": {
-          "date": {
+          "companyName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "dateApplied": {
             "type": "string",
             "format": "date"
           },
-          "temperatureC": {
-            "type": "integer",
-            "format": "int32"
+          "status": {
+            "minLength": 1,
+            "type": "string"
           },
-          "temperatureF": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "summary": {
+          "notes": {
             "type": "string",
             "nullable": true
           }

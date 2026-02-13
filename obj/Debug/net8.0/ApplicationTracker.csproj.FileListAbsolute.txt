@@ -33,3 +33,4 @@ C:\Users\fulkm\source\repos\ApplicationTracker\ApplicationTracker\obj\Debug\net8
 C:\Users\fulkm\source\repos\ApplicationTracker\ApplicationTracker\obj\Debug\net8.0\ApplicationTracker.pdb
 C:\Users\fulkm\source\repos\ApplicationTracker\ApplicationTracker\obj\Debug\net8.0\ApplicationTracker.genruntimeconfig.cache
 C:\Users\fulkm\source\repos\ApplicationTracker\ApplicationTracker\obj\Debug\net8.0\ref\ApplicationTracker.dll
+C:\Users\fulkm\source\repos\ApplicationTracker\ApplicationTracker\obj\Debug\net8.0\ApplicationTracker.sourcelink.json
