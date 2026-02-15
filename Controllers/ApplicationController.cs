@@ -1,8 +1,8 @@
 ﻿using ApplicationTracker.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace ApplicationTracker.Controllers
 {
@@ -70,13 +70,18 @@ namespace ApplicationTracker.Controllers
             return app;
         }
 
+        /// <summary>
+        /// Updates an existing application using the id from the route.
+        /// Returns 404 if the application does not exist.
+        /// </summary>
         [HttpPut("{id:int}")]
-        public IActionResult Put(int id, ApplicationModel application)
+        public IActionResult Update(int id, ApplicationModel application)
         {
             var foundId = _applications.FirstOrDefault(a => a.Id == id);
             if (foundId == null)
                 return NotFound();
 
+            // Apply updated values to the stored object
             foundId.CompanyName = application.CompanyName;
             foundId.DateApplied = application.DateApplied;
             foundId.Status = application.Status;
@@ -84,6 +89,22 @@ namespace ApplicationTracker.Controllers
 
             return NoContent();
 
+        }
+
+        /// <summary>
+        /// Deletes an application by id from the in-memory collection.
+        /// Returns 404 if the application does not exist.
+        /// </summary>
+        [HttpDelete("{id:int}")]
+        public IActionResult Delete(int id)
+        {
+            var itemToDelete = _applications.FirstOrDefault(a => a.Id == id);
+            if (itemToDelete == null)
+            {
+                return NotFound();
+            }
+            _applications.Remove(itemToDelete);
+            return NoContent();
         }
     }
 }
