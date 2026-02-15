@@ -69,5 +69,21 @@ namespace ApplicationTracker.Controllers
 
             return app;
         }
+
+        [HttpPut("{id:int}")]
+        public IActionResult Put(int id, ApplicationModel application)
+        {
+            var foundId = _applications.FirstOrDefault(a => a.Id == id);
+            if (foundId == null)
+                return NotFound();
+
+            foundId.CompanyName = application.CompanyName;
+            foundId.DateApplied = application.DateApplied;
+            foundId.Status = application.Status;
+            foundId.Notes = application.Notes;
+
+            return NoContent();
+
+        }
     }
 }
