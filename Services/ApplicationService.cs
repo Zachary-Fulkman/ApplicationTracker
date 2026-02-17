@@ -31,7 +31,7 @@ namespace ApplicationTracker.Services
         /// </summary>
         public List<ApplicationModel> GetAll()
         {
-            return _applications;
+            return _applications.ToList();
         }
 
         /// <summary>
@@ -50,18 +50,18 @@ namespace ApplicationTracker.Services
         /// </summary>
         public bool Update(int id, ApplicationModel updatedApplication)
         {
-            var foundId = _applications.FirstOrDefault(a => a.Id == id);
-            if (foundId == null)
+            var existing = _applications.FirstOrDefault(a => a.Id == id);
+            if (existing == null)
                 return false;
             
-            foundId.CompanyName = updatedApplication.CompanyName;
-            foundId.DateApplied = updatedApplication.DateApplied;
-            foundId.Status = updatedApplication.Status;
-            foundId.Notes = updatedApplication.Notes;
+            existing.CompanyName = updatedApplication.CompanyName;
+            existing.DateApplied = updatedApplication.DateApplied;
+            existing.Status = updatedApplication.Status;
+            existing.Notes = updatedApplication.Notes;
             return true;
         }
 
-        /// </summary>
+        /// <summary>
         /// Deletes an application by Id.
         /// Returns true if deletion occurred,
         /// false if the Id was not found.

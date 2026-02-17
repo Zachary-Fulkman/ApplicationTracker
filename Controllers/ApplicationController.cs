@@ -1,45 +1,35 @@
 ﻿using ApplicationTracker.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+using ApplicationTracker.Services;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace ApplicationTracker.Controllers
 {
     /// <summary>
-    /// Controller that handles CRUD for the application data from the ApplicationModel class
-    /// Temporary in-memory storage
+    /// API controller that exposes CRUD endpoints for job applications.
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
 
     public class ApplicationController : ControllerBase
     {
-        /// <summary>
-        /// List acts as our temporary database
-        /// </summary>
-        private static readonly List<ApplicationModel> _applications = new();
+        private readonly IApplicationService _service;
+        public ApplicationController(IApplicationService service)
+        {
+            _service = service;
+        }
 
         /// <summary>
-        /// Counter used to assign ID
-        /// Static so it increments across requests
-        /// </summary>
-        private static int _idCounter = 0;
-
-        /// <summary>
-        /// New job application creation
+        /// Creates a new job application.
         /// </summary>
         /// <param name="application"></param>
         /// <returns></returns>
         [HttpPost]
         public IActionResult Create(ApplicationModel application)
         {
-            // Server assigns ID
-            application.Id = Interlocked.Increment(ref _idCounter);
-            // Stores the application in the List
-            _applications.Add(application);
+            var createdApplication = _service.Create(application);
             // Retruns 201 created and includes location
-            return CreatedAtAction(nameof(GetById), new { id = application.Id }, application);
+            return CreatedAtAction(nameof(GetById), new { id = createdApplication.Id }, createdApplication);
         }
 
         /// <summary>
@@ -49,11 +39,11 @@ namespace ApplicationTracker.Controllers
         [HttpGet]
         public ActionResult<List<ApplicationModel>> GetAll()
         {
-            return _applications;
+            return Ok(_service.GetAll());
         }
 
         /// <summary>
-        /// Returns an application by its ID
+        /// Retrieves a job application by its Id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -61,13 +51,13 @@ namespace ApplicationTracker.Controllers
         public ActionResult<ApplicationModel> GetById(int id)
         {
             // Finds application in the List
-            var app = _applications.FirstOrDefault(a => a.Id == id);
+            var app = _service.GetById(id);
 
             // If not found return a 404
             if (app == null)
                 return NotFound();
 
-            return app;
+            return Ok(app);
         }
 
         /// <summary>
@@ -77,33 +67,26 @@ namespace ApplicationTracker.Controllers
         [HttpPut("{id:int}")]
         public IActionResult Update(int id, ApplicationModel application)
         {
-            var foundId = _applications.FirstOrDefault(a => a.Id == id);
-            if (foundId == null)
+            var updated = _service.Update(id, application);
+
+            if (!updated)
                 return NotFound();
 
-            // Apply updated values to the stored object
-            foundId.CompanyName = application.CompanyName;
-            foundId.DateApplied = application.DateApplied;
-            foundId.Status = application.Status;
-            foundId.Notes = application.Notes;
-
             return NoContent();
-
         }
 
         /// <summary>
-        /// Deletes an application by id from the in-memory collection.
-        /// Returns 404 if the application does not exist.
+        /// Deletes a job application by id.
+        /// Returns 404 if the id does not exist.
         /// </summary>
         [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
-            var itemToDelete = _applications.FirstOrDefault(a => a.Id == id);
-            if (itemToDelete == null)
+            var deleted = _service.Delete(id);
+            if (!deleted)
             {
                 return NotFound();
             }
-            _applications.Remove(itemToDelete);
             return NoContent();
         }
     }
