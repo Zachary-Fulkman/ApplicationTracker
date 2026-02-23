@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ApplicationTracker.Services;
 using System.Collections.Generic;
+using ApplicationTracker.Dtos;
 
 namespace ApplicationTracker.Controllers
 {
@@ -22,14 +23,22 @@ namespace ApplicationTracker.Controllers
         /// <summary>
         /// Creates a new job application.
         /// </summary>
-        /// <param name="application"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Create(ApplicationModel application)
+        public async Task<IActionResult> Create(CreateApplicationRequest request)
         {
-            var createdApplication = await _service.Create(application);
-            // Retruns 201 created and includes location
-            return CreatedAtAction(nameof(GetById), new { id = createdApplication.Id }, createdApplication);
+            var application = new ApplicationModel
+            {
+                CompanyName = request.CompanyName,
+                DateApplied = request.DateApplied,
+                Status = request.Status,
+                Notes = request.Notes
+            };
+
+            var created = await _service.Create(application);
+
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
         /// <summary>
@@ -64,9 +73,17 @@ namespace ApplicationTracker.Controllers
         /// Returns 404 if the application does not exist.
         /// </summary>
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, ApplicationModel application)
+        public async Task<IActionResult> Update(int id, UpdateApplicationRequest request)
         {
-            var updated = await _service.Update(id, application);
+            var updatedApplication = new ApplicationModel
+            {
+                CompanyName = request.CompanyName,
+                DateApplied = request.DateApplied,
+                Status = request.Status,
+                Notes = request.Notes
+            };
+
+            var updated = await _service.Update(id, updatedApplication);
 
             if (!updated)
                 return NotFound();
