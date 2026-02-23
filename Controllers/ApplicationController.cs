@@ -25,9 +25,9 @@ namespace ApplicationTracker.Controllers
         /// <param name="application"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Create(ApplicationModel application)
+        public async Task<IActionResult> Create(ApplicationModel application)
         {
-            var createdApplication = _service.Create(application);
+            var createdApplication = await _service.Create(application);
             // Retruns 201 created and includes location
             return CreatedAtAction(nameof(GetById), new { id = createdApplication.Id }, createdApplication);
         }
@@ -37,9 +37,9 @@ namespace ApplicationTracker.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult<List<ApplicationModel>> GetAll()
+        public async Task<ActionResult<List<ApplicationModel>>> GetAll()
         {
-            return Ok(_service.GetAll());
+            return Ok( await _service.GetAll());
         }
 
         /// <summary>
@@ -48,10 +48,9 @@ namespace ApplicationTracker.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id:int}")]
-        public ActionResult<ApplicationModel> GetById(int id)
+        public async Task<ActionResult<ApplicationModel>> GetById(int id)
         {
-            // Finds application in the List
-            var app = _service.GetById(id);
+            var app = await _service.GetById(id);
 
             // If not found return a 404
             if (app == null)
@@ -65,9 +64,9 @@ namespace ApplicationTracker.Controllers
         /// Returns 404 if the application does not exist.
         /// </summary>
         [HttpPut("{id:int}")]
-        public IActionResult Update(int id, ApplicationModel application)
+        public async Task<IActionResult> Update(int id, ApplicationModel application)
         {
-            var updated = _service.Update(id, application);
+            var updated = await _service.Update(id, application);
 
             if (!updated)
                 return NotFound();
@@ -80,9 +79,9 @@ namespace ApplicationTracker.Controllers
         /// Returns 404 if the id does not exist.
         /// </summary>
         [HttpDelete("{id:int}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var deleted = _service.Delete(id);
+            var deleted = await _service.Delete(id);
             if (!deleted)
             {
                 return NotFound();

@@ -4,10 +4,10 @@ namespace ApplicationTracker.Services
 {
     public interface IApplicationService
     {
-        ApplicationModel Create(ApplicationModel application);
-        List<ApplicationModel> GetAll();
-        ApplicationModel? GetById(int id);
-        bool Update(int id, ApplicationModel updatedApplication);
-        bool Delete(int id);
+        Task<ApplicationModel> Create(ApplicationModel application);
+        Task<List<ApplicationModel>> GetAll();
+        Task<ApplicationModel?> GetById(int id);
+        Task<bool> Update(int id, ApplicationModel updatedApplication);
+        Task<bool> Delete(int id);
     }
 }
