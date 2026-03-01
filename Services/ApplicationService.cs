@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using ApplicationTracker.Models;
 using ApplicationTracker.Data;
+using ApplicationTracker.Dtos;
+using ApplicationTracker.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTracker.Services
@@ -36,6 +38,64 @@ namespace ApplicationTracker.Services
         public async Task<List<ApplicationModel>> GetAll()
         {
             return await _db.Applications.ToListAsync();
+        }
+
+        /// <summary>
+        /// Searches applications with optional filters and pagination.
+        /// Only applies filters that are actually provided.
+        /// </summary>
+        public async Task<PagedResult<ApplicationModel>> Search(
+        string? status,
+        string? company,
+        DateOnly? fromDate,
+        DateOnly? toDate,
+        int page,
+        int pageSize)
+        {
+            var query = _db.Applications.AsQueryable();
+
+            // Guardrails for pagination so weird inputs don't break things.
+            page = page < 1 ? 1 : page;
+            pageSize = pageSize < 1 ? 10 : pageSize;
+            pageSize = pageSize > 100 ? 100 : pageSize;
+
+            // Apply filters only if values were passed in. 
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query = query.Where(a => a.Status == status);
+            }
+
+            if (!string.IsNullOrWhiteSpace(company))
+            {
+                query = query.Where(a => a.CompanyName.Contains(company));
+            }
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(a => a.DateApplied >= fromDate.Value);
+            }
+
+            if (toDate.HasValue)
+            {
+                query = query.Where(a => a.DateApplied <= toDate.Value);
+            }
+
+            // Get the total number of matching records before paging
+            var totalCount = await query.CountAsync();
+            // Order before Skip or Take so pagination stays consistent.
+            query = query.OrderByDescending(a => a.DateApplied);
+
+            // Apply pagination at the database level.
+            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            // Return the results along with pagination info.
+            return new PagedResult<ApplicationModel>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         /// <summary>

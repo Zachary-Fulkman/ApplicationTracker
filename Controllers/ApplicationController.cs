@@ -42,13 +42,20 @@ namespace ApplicationTracker.Controllers
         }
 
         /// <summary>
-        /// Returns all saved applications
+        /// Returns applications with optional filters and pagination.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<ApplicationModel>>> GetAll()
+        public async Task<ActionResult<PagedResult<ApplicationModel>>> GetAll(
+            [FromQuery] string? status,
+            [FromQuery] string? company,
+            [FromQuery] DateOnly? fromDate,
+            [FromQuery] DateOnly? toDate,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-            return Ok( await _service.GetAll());
+            var result = await _service.Search(status, company, fromDate, toDate, page, pageSize);
+            return Ok(result);
         }
 
         /// <summary>
