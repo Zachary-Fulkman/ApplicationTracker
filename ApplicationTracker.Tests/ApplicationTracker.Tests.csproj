@@ -7,6 +7,7 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+<PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +37,12 @@
   <Compile Remove="ApplicationTracker.Tests\**\*.cs" />
   <None Remove="ApplicationTracker.Tests\**\*.*" />
   <Content Remove="ApplicationTracker.Tests\**\*.*" />
+</ItemGroup>
+
+<ItemGroup>
+  <None Update="testhost.deps.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
 </ItemGroup>
 
 </Project>
