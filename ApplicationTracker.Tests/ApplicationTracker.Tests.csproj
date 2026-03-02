@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ApplicationTracker\ApplicationTracker.csproj" />
+    <ProjectReference Include="..\ApplicationTracker.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,5 +31,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+<ItemGroup>
+  <Compile Remove="ApplicationTracker.Tests\**\*.cs" />
+  <None Remove="ApplicationTracker.Tests\**\*.*" />
+  <Content Remove="ApplicationTracker.Tests\**\*.*" />
+</ItemGroup>
 
 </Project>

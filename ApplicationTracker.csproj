@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ApplicationTracker.Tests\**" />
+    <Content Remove="ApplicationTracker.Tests\**" />
+    <EmbeddedResource Remove="ApplicationTracker.Tests\**" />
+    <None Remove="ApplicationTracker.Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
       <PrivateAssets>all</PrivateAssets>
