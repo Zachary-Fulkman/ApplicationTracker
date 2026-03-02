@@ -25,5 +25,16 @@ jobs:
       - name: Build
         run: dotnet build --no-restore -c Release
 
+      - name: Diagnostic - list test output
+  run: |
+    echo "=== repo root ==="
+    ls -la
+    echo "=== find deps files ==="
+    find . -maxdepth 5 -name "*deps.json" -print
+    echo "=== list test bin Release ==="
+    ls -la ApplicationTracker.Tests/bin/Release/net8.0 || true
+    echo "=== list test bin Debug ==="
+    ls -la ApplicationTracker.Tests/bin/Debug/net8.0 || true
+
       - name: Test
         run: dotnet test ApplicationTracker.sln -c Release
