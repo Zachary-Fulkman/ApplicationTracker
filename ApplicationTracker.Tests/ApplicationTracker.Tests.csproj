@@ -7,9 +7,6 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-<PreserveCompilationContext>true</PreserveCompilationContext>
-<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,20 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
-<Target Name="CreateTesthostDepsJson" AfterTargets="Build">
-  <Copy
-    SourceFiles="$(TargetDir)$(AssemblyName).deps.json"
-    DestinationFiles="$(TargetDir)testhost.deps.json"
-    SkipUnchangedFiles="true"
-    Condition="Exists('$(TargetDir)$(AssemblyName).deps.json')" />
-</Target>
 </Project>
