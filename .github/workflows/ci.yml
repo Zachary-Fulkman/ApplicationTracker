@@ -23,18 +23,18 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --no-restore -c Release
+        run: dotnet build -c Release --no-restore
 
-      - name: Diagnostic - list test output
+      - name: Ensure testhost.deps.json exists (CI workaround)
         run: |
-          echo "=== repo root ==="
-          ls -la
-          echo "=== find deps files ==="
-          find . -maxdepth 6 -name "*deps.json" -print
-          echo "=== list test bin Release ==="
-          ls -la ApplicationTracker.Tests/bin/Release/net8.0 || true
-          echo "=== list test bin Debug ==="
-          ls -la ApplicationTracker.Tests/bin/Debug/net8.0 || true
+          set -e
+          for deps in $(find . -path "*/ApplicationTracker.Tests/bin/Release/net8.0/ApplicationTracker.Tests.deps.json"); do
+            dir=$(dirname "$deps")
+            if [ ! -f "$dir/testhost.deps.json" ]; then
+              echo "Creating $dir/testhost.deps.json"
+              cp "$deps" "$dir/testhost.deps.json"
+            fi
+          done
 
       - name: Test
-        run: dotnet test ApplicationTracker.sln -c Release --no-restore
+        run: dotnet test ApplicationTracker.sln -c Release --no-build
