@@ -35,4 +35,11 @@
     </None>
   </ItemGroup>
 
+<Target Name="CreateTesthostDepsJson" AfterTargets="Build">
+  <Copy
+    SourceFiles="$(TargetDir)$(AssemblyName).deps.json"
+    DestinationFiles="$(TargetDir)testhost.deps.json"
+    SkipUnchangedFiles="true"
+    Condition="Exists('$(TargetDir)$(AssemblyName).deps.json')" />
+</Target>
 </Project>
