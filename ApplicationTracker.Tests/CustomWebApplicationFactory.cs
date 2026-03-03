@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace ApplicationTracker.Tests
 {
-    public class CustomWebApplicationFactory : WebApplicationFactory<Program>
+    public class CustomWebApplicationFactory : WebApplicationFactory<ApplicationTracker.Program>
     {
         private readonly string _dbName = $"ApplicationTracker_TestDb_{Guid.NewGuid()}";
         protected override void ConfigureWebHost(IWebHostBuilder builder)

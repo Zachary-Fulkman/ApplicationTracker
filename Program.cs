@@ -31,3 +31,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+namespace ApplicationTracker
+{
+    public partial class Program { }
+}
