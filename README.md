@@ -1,3 +1,9 @@
+## Live API
+
+Swagger documentation:
+
+https://applicationtracker-papa.onrender.com/swagger
+
 # Application Tracker API
 
 This is a backend API built with ASP.NET Core that allows users to manage job applications.  
