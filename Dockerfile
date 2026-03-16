@@ -2,13 +2,18 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj files and restore
+# Copy solution and project files first
+COPY ApplicationTracker.sln ./
 COPY ApplicationTracker.csproj ./
 COPY ApplicationTracker.Tests/ApplicationTracker.Tests.csproj ApplicationTracker.Tests/
+
+# Restore dependencies
 RUN dotnet restore ApplicationTracker.sln
 
-# Copy everything else and publish
+# Copy everything else
 COPY . .
+
+# Publish the API
 RUN dotnet publish ApplicationTracker.csproj -c Release -o /app/publish
 
 # Runtime stage
@@ -17,9 +22,7 @@ WORKDIR /app
 
 COPY --from=build /app/publish .
 
-# Render injects PORT; ASP.NET must listen on it
 ENV ASPNETCORE_URLS=http://0.0.0.0:10000
-
 EXPOSE 10000
 
 ENTRYPOINT ["dotnet", "ApplicationTracker.dll"]
