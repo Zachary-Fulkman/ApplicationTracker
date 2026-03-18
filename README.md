@@ -66,3 +66,5 @@ Each test:
 This ensures the entire request pipeline works correctly — from controller to database.
 
 All tests run automatically through GitHub Actions on every push and pull request.
+
+## Testing CI/CD trigger
