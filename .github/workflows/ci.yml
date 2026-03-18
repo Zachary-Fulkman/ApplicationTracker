@@ -20,10 +20,10 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore ApplicationTracker.sln
 
       - name: Build
-        run: dotnet build -c Release --no-restore
+        run: dotnet build ApplicationTracker.sln -c Release --no-restore
 
       - name: Ensure testhost.deps.json exists (CI workaround)
         run: |
@@ -37,4 +37,15 @@ jobs:
           done
 
       - name: Test
-        run: dotnet test ApplicationTracker.sln -c Release --no-build
+        run: dotnet test ApplicationTracker.sln -c Release --no-build --no-restore
+
+  deploy-to-render:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Trigger Render Deploy
+        run: curl -X POST "$RENDER_DEPLOY_HOOK"
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
