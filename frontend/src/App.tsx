@@ -4,6 +4,7 @@ import {
     getApplications,
     createApplication,
     deleteApplication,
+    updateApplication,
     type Application,
 } from "./api/applicationApi";
 
@@ -12,6 +13,7 @@ function App() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showForm, setShowForm] = useState(false);
+    const [editingAppId, setEditingAppId] = useState<number | null>(null);
 
     const [companyName, setCompanyName] = useState("");
     const [dateApplied, setDateApplied] = useState("");
@@ -29,6 +31,16 @@ function App() {
         }
     }
 
+    function handleEdit(app: Application) {
+        setEditingAppId(app.id);
+        setCompanyName(app.companyName);
+        setDateApplied(app.dateApplied);
+        setStatus(app.status);
+        setNotes(app.notes);
+        setShowForm(true);
+        setError(null);
+    }
+
     useEffect(() => {
         loadApplications();
     }, []);
@@ -39,22 +51,33 @@ function App() {
         try {
             setError(null);
 
-            await createApplication({
+            const formData = {
                 companyName,
                 dateApplied,
                 status,
                 notes,
-            });
+            };
+
+            if (editingAppId !== null) {
+                await updateApplication(editingAppId, formData);
+            } else {
+                await createApplication(formData);
+            }
 
             setCompanyName("");
             setDateApplied("");
             setStatus("");
             setNotes("");
+            setEditingAppId(null);
             setShowForm(false);
 
             await loadApplications();
         } catch {
-            setError("Failed to create application");
+            setError(
+                editingAppId !== null
+                    ? "Failed to update application"
+                    : "Failed to create application"
+            );
         }
     }
 
@@ -126,12 +149,19 @@ function App() {
 
                     <div className="form-actions">
                         <button className="primary-button" type="submit">
-                            Save Application
+                            {editingAppId !== null ? "Update Application" : "Save Application"}
                         </button>
                         <button
                             className="secondary-button"
                             type="button"
-                            onClick={() => setShowForm(false)}
+                            onClick={() => {
+                                setShowForm(false);
+                                setEditingAppId(null);
+                                setCompanyName("");
+                                setDateApplied("");
+                                setStatus("");
+                                setNotes("");
+                            }}
                         >
                             Cancel
                         </button>
@@ -159,7 +189,11 @@ function App() {
                             </p>
 
                             <div className="card-actions">
-                                <button className="card-button" type="button">
+                                <button
+                                    className="card-button"
+                                    type="button"
+                                    onClick={() => handleEdit(app)}
+                                >
                                     Update
                                 </button>
                                 <button
