@@ -20,9 +20,15 @@ function App() {
     const [status, setStatus] = useState("");
     const [notes, setNotes] = useState("");
 
+    const [statusFilter, setStatusFilter] = useState("");
+    const [companyFilter, setCompanyFilter] = useState("");
+
     async function loadApplications() {
         try {
-            const result = await getApplications();
+            const result = await getApplications({
+                status: statusFilter,
+                company: companyFilter,
+            });
             setApplications(result.items);
         } catch {
             setError("Failed to load applications");
@@ -42,8 +48,22 @@ function App() {
     }
 
     useEffect(() => {
-        loadApplications();
-    }, []);
+        async function fetchData() {
+            try {
+                const result = await getApplications({
+                    status: statusFilter,
+                    company: companyFilter,
+                });
+                setApplications(result.items);
+            } catch {
+                setError("Failed to load applications");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchData();
+    }, [statusFilter, companyFilter]);
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -188,6 +208,26 @@ function App() {
                     </div>
                 </form>
             )}
+
+            <div className="filter-bar">
+                <input
+                    type="text"
+                    placeholder="Search company..."
+                    value={companyFilter}
+                    onChange={(e) => setCompanyFilter(e.target.value)}
+                />
+
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Applied">Applied</option>
+                    <option value="Interview">Interview</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
 
             {loading ? (
                 <p>Loading...</p>
