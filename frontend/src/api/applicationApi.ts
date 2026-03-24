@@ -57,3 +57,27 @@ export async function deleteApplication(id: number) {
         throw new Error("Failed to delete application");
     }
 }
+
+export interface UpdateApplicationRequest {
+    companyName: string;
+    dateApplied: string;
+    status: string;
+    notes: string;
+}
+
+export async function updateApplication(
+    id: number,
+    data: UpdateApplicationRequest
+) {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to update application");
+    }
+}
