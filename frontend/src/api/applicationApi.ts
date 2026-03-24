@@ -15,8 +15,25 @@ export interface PagedResult<T> {
 
 const BASE_URL = "https://localhost:7031/api/application";
 
-export async function getApplications(): Promise<PagedResult<Application>> {
-    const response = await fetch(BASE_URL);
+export interface GetApplicationsParams {
+    status?: string;
+    company?: string;
+}
+
+export async function getApplications(
+    params?: GetApplicationsParams
+): Promise<PagedResult<Application>> {
+    const url = new URL(BASE_URL);
+
+    if (params?.status) {
+        url.searchParams.append("status", params.status);
+    }
+
+    if (params?.company) {
+        url.searchParams.append("company", params.company);
+    }
+
+    const response = await fetch(url.toString());
 
     if (!response.ok) {
         throw new Error("Failed to fetch applications");
