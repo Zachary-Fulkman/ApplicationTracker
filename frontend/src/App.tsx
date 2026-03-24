@@ -3,6 +3,7 @@ import "./App.css";
 import {
     getApplications,
     createApplication,
+    deleteApplication,
     type Application,
 } from "./api/applicationApi";
 
@@ -54,6 +55,15 @@ function App() {
             await loadApplications();
         } catch {
             setError("Failed to create application");
+        }
+    }
+
+    async function handleDelete(id: number) {
+        try {
+            await deleteApplication(id);
+            await loadApplications();
+        } catch {
+            setError("Failed to delete application");
         }
     }
 
@@ -152,7 +162,11 @@ function App() {
                                 <button className="card-button" type="button">
                                     Update
                                 </button>
-                                <button className="card-button" type="button">
+                                <button
+                                   className="card-button"
+                                   type="button"
+                                   onClick={() => handleDelete(app.id)}
+                                >
                                     Delete
                                 </button>
                             </div>
