@@ -22,6 +22,9 @@ function App() {
 
     const [statusFilter, setStatusFilter] = useState("");
     const [companyFilter, setCompanyFilter] = useState("");
+    const [page, setPage] = useState(1);
+    const pageSize = 10;
+    const [totalCount, setTotalCount] = useState(0);
 
     async function loadApplications() {
         try {
@@ -30,6 +33,7 @@ function App() {
                 company: companyFilter,
             });
             setApplications(result.items);
+            setTotalCount(result.totalCount);
         } catch {
             setError("Failed to load applications");
         } finally {
@@ -48,13 +52,20 @@ function App() {
     }
 
     useEffect(() => {
+        setPage(1);
+    }, [statusFilter, companyFilter]);
+
+    useEffect(() => {
         async function fetchData() {
             try {
                 const result = await getApplications({
                     status: statusFilter,
                     company: companyFilter,
+                    page,
+                    pageSize,
                 });
                 setApplications(result.items);
+                setTotalCount(result.totalCount);
             } catch {
                 setError("Failed to load applications");
             } finally {
@@ -63,7 +74,7 @@ function App() {
         }
 
         fetchData();
-    }, [statusFilter, companyFilter]);
+    }, [statusFilter, companyFilter, page]);
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -211,6 +222,7 @@ function App() {
 
             <div className="filter-bar">
                 <input
+                    className="filter-input"
                     type="text"
                     placeholder="Search company..."
                     value={companyFilter}
@@ -218,6 +230,7 @@ function App() {
                 />
 
                 <select
+                    className="filter-select"
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                 >
@@ -229,47 +242,68 @@ function App() {
                 </select>
             </div>
 
-            {loading ? (
-                <p>Loading...</p>
-            ) : applications.length === 0 ? (
-                <p className="empty-state">No applications found.</p>
-            ) : (
-                <div className="application-grid">
-                    {applications.map((app) => (
-                        <div className="application-card" key={app.id}>
-                            <h2>{app.companyName}</h2>
-                            <p>
-                                <strong>Status:</strong> {app.status}
-                            </p>
-                            <p>
-                                <strong>Date Applied:</strong> {app.dateApplied}
-                            </p>
-                            <p>
-                                <strong>Notes:</strong> {app.notes}
-                            </p>
+            <div>
+                {loading ? (
+                    <p>Loading...</p>
+                ) : applications.length === 0 ? (
+                    <p className="empty-state">No applications found.</p>
+                ) : (
+                    <div className="application-grid">
+                        {applications.map((app) => (
+                            <div className="application-card" key={app.id}>
+                                <h2>{app.companyName}</h2>
+                                <p>
+                                    <strong>Status:</strong> {app.status}
+                                </p>
+                                <p>
+                                    <strong>Date Applied:</strong> {app.dateApplied}
+                                </p>
+                                <p>
+                                    <strong>Notes:</strong> {app.notes}
+                                </p>
 
-                            <div className="card-actions">
-                                <button
-                                    className="card-button"
-                                    type="button"
-                                    onClick={() => handleEdit(app)}
-                                >
-                                    Update
-                                </button>
-                                <button
-                                   className="card-button"
-                                   type="button"
-                                   onClick={() => handleDelete(app.id)}
-                                >
-                                    Delete
-                                </button>
+                                <div className="card-actions">
+                                    <button
+                                        className="card-button"
+                                        type="button"
+                                        onClick={() => handleEdit(app)}
+                                    >
+                                        Update
+                                    </button>
+                                    <button
+                                        className="card-button"
+                                        type="button"
+                                        onClick={() => handleDelete(app.id)}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
+                )}
+
+                <div className="pagination">
+                    <button
+                        className="pagination-button"
+                        onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={page === 1}
+                    >
+                        Previous
+                    </button>
+
+                    <span className="pagination-info">Page {page}</span>
+
+                    <button
+                        className="pagination-button"
+                        onClick={() => setPage((prev) => prev + 1)}
+                        disabled={page * pageSize >= totalCount}
+                    >
+                        Next
+                    </button>
                 </div>
-            )}
+            </div>
         </div>
     );
 }
-
 export default App;
