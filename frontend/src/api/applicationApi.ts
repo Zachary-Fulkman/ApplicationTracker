@@ -18,6 +18,8 @@ const BASE_URL = "https://localhost:7031/api/application";
 export interface GetApplicationsParams {
     status?: string;
     company?: string;
+    page?: number;
+    pageSize?: number;
 }
 
 export async function getApplications(
@@ -31,6 +33,14 @@ export async function getApplications(
 
     if (params?.company) {
         url.searchParams.append("company", params.company);
+    }
+
+    if (params?.page) {
+        url.searchParams.append("page", params.page.toString());
+    }
+
+    if (params?.pageSize) {
+        url.searchParams.append("pageSize", params.pageSize.toString());
     }
 
     const response = await fetch(url.toString());
