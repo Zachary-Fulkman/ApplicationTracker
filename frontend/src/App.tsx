@@ -48,6 +48,23 @@ function App() {
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
+        setError(null);
+
+        if (!companyName.trim()) {
+            setError("Company name is required");
+            return;
+        }
+
+        if (!dateApplied.trim()) {
+            setError("Date applied is required");
+            return;
+        }
+
+        if (!status.trim()) {
+            setError("Status is required");
+            return;
+        }
+
         try {
             setError(null);
 
@@ -82,6 +99,8 @@ function App() {
     }
 
     async function handleDelete(id: number) {
+        const confirmed = window.confirm("Are you sure you want to delete this application?");
+        if (!confirmed) return;
         try {
             await deleteApplication(id);
             await loadApplications();
@@ -161,6 +180,7 @@ function App() {
                                 setDateApplied("");
                                 setStatus("");
                                 setNotes("");
+                                setError(null);
                             }}
                         >
                             Cancel
