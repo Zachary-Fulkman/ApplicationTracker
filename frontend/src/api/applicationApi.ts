@@ -13,7 +13,7 @@ export interface PagedResult<T> {
     pageSize: number;
 }
 
-const BASE_URL = "http://localhost:5264/api/application";
+const BASE_URL = "https://localhost:7031/api/application";
 
 export async function getApplications(): Promise<PagedResult<Application>> {
     const response = await fetch(BASE_URL);
@@ -33,7 +33,7 @@ export interface CreateApplicationRequest {
 }
 
 export async function createApplication(data: CreateApplicationRequest) {
-    const response = await fetch("http://localhost:5264/api/application", {
+    const response = await fetch(BASE_URL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
