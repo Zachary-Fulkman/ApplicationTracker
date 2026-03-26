@@ -15,6 +15,8 @@ function App() {
     const [showForm, setShowForm] = useState(false);
     const [editingAppId, setEditingAppId] = useState<number | null>(null);
 
+    const today = new Date().toISOString().split("T")[0];
+
     const [companyName, setCompanyName] = useState("");
     const [dateApplied, setDateApplied] = useState("");
     const [status, setStatus] = useState("");
@@ -90,6 +92,12 @@ function App() {
             setError("Date applied is required");
             return;
         }
+
+        if (dateApplied > today) {
+            setError("Date cannot be in the future");
+            return;
+        }
+        
 
         if (!status.trim()) {
             setError("Status is required");
@@ -172,8 +180,12 @@ function App() {
                             <input
                                 id="dateApplied"
                                 type="date"
+                                max={today}
                                 value={dateApplied}
-                                onChange={(event) => setDateApplied(event.target.value)}
+                                onChange={(event) => {
+                                    setError(null);
+                                    setDateApplied(event.target.value);
+                                }}
                             />
                         </div>
 
