@@ -13,6 +13,7 @@ namespace ApplicationTracker.Tests
         private readonly string _dbName = $"ApplicationTracker_TestDb_{Guid.NewGuid()}";
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseEnvironment("Testing");
             builder.ConfigureServices(services =>
             {
                 // Remove the real DbContext
