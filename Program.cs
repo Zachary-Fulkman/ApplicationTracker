@@ -17,10 +17,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("FrontendPolicy", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins("http://localhost:5173", "https://applicationtracker-1.onrender.com")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -35,7 +35,7 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-app.UseCors("FrontendPolicy");
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
