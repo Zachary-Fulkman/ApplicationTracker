@@ -16,6 +16,8 @@ namespace ApplicationTracker.Models
         [Required(ErrorMessage = "Status of Application is Required")]
         public string? Status { get; set; }
         public string? Notes { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public AppUser? User { get; set; }
 
     }
 }
