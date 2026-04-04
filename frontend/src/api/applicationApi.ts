@@ -1,4 +1,7 @@
-﻿export interface Application {
+﻿/**
+ * Represents a single job application in the system.
+ */
+export interface Application {
     id: number;
     companyName: string;
     dateApplied: string;
@@ -6,6 +9,9 @@
     notes: string;
 }
 
+/**
+ * Generic structure for paginated API responses.
+ */
 export interface PagedResult<T> {
     items: T[];
     totalCount: number;
@@ -15,6 +21,9 @@ export interface PagedResult<T> {
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+/**
+ * Query parameters used when fetching applications (filters + pagination).
+ */
 export interface GetApplicationsParams {
     status?: string;
     company?: string;
@@ -22,6 +31,9 @@ export interface GetApplicationsParams {
     pageSize?: number;
 }
 
+/**
+ * Fetches applications from the backend with optional filters and pagination.
+ */
 export async function getApplications(
     params?: GetApplicationsParams
 ): Promise<PagedResult<Application>> {
@@ -52,6 +64,9 @@ export async function getApplications(
     return response.json();
 }
 
+/**
+ * Payload used when creating a new job application.
+ */
 export interface CreateApplicationRequest {
     companyName: string;
     dateApplied: string;
@@ -59,6 +74,9 @@ export interface CreateApplicationRequest {
     notes: string;
 }
 
+/**
+ * Sends a request to create a new application.
+ */
 export async function createApplication(data: CreateApplicationRequest) {
     const response = await fetch(BASE_URL, {
         method: "POST",
@@ -75,6 +93,9 @@ export async function createApplication(data: CreateApplicationRequest) {
     return response.json();
 }
 
+/**
+ * Deletes an application by its ID.
+ */
 export async function deleteApplication(id: number) {
     const response = await fetch(`${BASE_URL}/${id}`, {
         method: "DELETE",
@@ -85,6 +106,9 @@ export async function deleteApplication(id: number) {
     }
 }
 
+/**
+ * Payload used when updating an existing application.
+ */
 export interface UpdateApplicationRequest {
     companyName: string;
     dateApplied: string;
@@ -92,6 +116,9 @@ export interface UpdateApplicationRequest {
     notes: string;
 }
 
+/**
+ * Updates an existing application by ID.
+ */
 export async function updateApplication(
     id: number,
     data: UpdateApplicationRequest

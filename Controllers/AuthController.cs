@@ -10,6 +10,9 @@ using ApplicationTracker.Dtos;
 
 namespace ApplicationTracker.Controllers
 {
+    /// <summary>
+    /// Handles user authentication: registering new users and logging in to generate JWT tokens.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
@@ -23,6 +26,9 @@ namespace ApplicationTracker.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Creates a new user account using email and password.
+        /// </summary>
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
@@ -42,6 +48,9 @@ namespace ApplicationTracker.Controllers
             return Ok(new { message = "User registered successfully." });
         }
 
+        /// <summary>
+        /// Validates user credentials and returns a JWT token if successful.
+        /// </summary>
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
@@ -64,6 +73,9 @@ namespace ApplicationTracker.Controllers
             return Ok(new { token });
         }
 
+        /// <summary>
+        /// Generates a JWT token containing user identity claims for authenticated requests.
+        /// </summary>
         private string GenerateJwtToken(AppUser user)
         {
             var jwtKey = _configuration["Jwt:Key"]
