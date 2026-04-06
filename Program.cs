@@ -1,21 +1,55 @@
-using ApplicationTracker.Services;
-using Microsoft.EntityFrameworkCore;
+using System.Text;
 using ApplicationTracker.Data;
 using ApplicationTracker.Models;
+using ApplicationTracker.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://*:{port}");
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://*:{port}");
+}
 
 // Add services to the container.
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "ApplicationTracker API", Version = "v1" });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by a space and your token.\nExample: Bearer abc123"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -72,8 +106,32 @@ var app = builder.Build();
 if (!app.Environment.IsEnvironment("Testing"))
 {
     using var scope = app.Services.CreateScope();
+
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
+
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+
+    var demoEmail = "demo@tracker.com";
+    var demoPassword = "Demo123!";
+
+    var existingDemoUser = await userManager.FindByEmailAsync(demoEmail);
+
+    if (existingDemoUser == null)
+    {
+        var demoUser = new AppUser
+        {
+            UserName = demoEmail,
+            Email = demoEmail
+        };
+
+        var result = await userManager.CreateAsync(demoUser, demoPassword);
+
+        if (!result.Succeeded)
+        {
+            throw new Exception("Failed to create demo user.");
+        }
+    }
 }
 
 // Configure the HTTP request pipeline.

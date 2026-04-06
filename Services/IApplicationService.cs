@@ -18,14 +18,15 @@ namespace ApplicationTracker.Services
         /// <param name="pageSize"></param>
         /// <returns></returns>
         Task<PagedResult<ApplicationModel>> Search(
+            string userId,
             string? status,
             string? company,
             DateOnly? fromDate,
             DateOnly? toDate,
             int page,
             int pageSize);
-        Task<ApplicationModel?> GetById(int id);
-        Task<bool> Update(int id, ApplicationModel updatedApplication);
-        Task<bool> Delete(int id);
+        Task<ApplicationModel?> GetById(int id, string userId);
+        Task<bool> Update(int id, ApplicationModel updatedApplication, string userId);
+        Task<bool> Delete(int id, string userId);
     }
 }

@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using ApplicationTracker.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using ApplicationTracker.Dtos;
@@ -30,7 +29,7 @@ namespace ApplicationTracker.Controllers
         /// Creates a new user account using email and password.
         /// </summary>
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequest request)
+        public async Task<IActionResult> Register(RegisterUserRequest request)
         {
             var user = new AppUser
             {
@@ -52,7 +51,7 @@ namespace ApplicationTracker.Controllers
         /// Validates user credentials and returns a JWT token if successful.
         /// </summary>
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<IActionResult> Login(LoginUserRequest request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
 

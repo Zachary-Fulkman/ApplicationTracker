@@ -200,3 +200,9 @@
     color: #d1d5db;
     font-weight: 600;
 }
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}

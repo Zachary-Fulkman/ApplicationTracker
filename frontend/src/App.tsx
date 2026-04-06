@@ -5,6 +5,7 @@ import {
     createApplication,
     deleteApplication,
     updateApplication,
+    loginUser,
     type Application,
 } from "./api/applicationApi";
 
@@ -14,6 +15,10 @@ function App() {
     const [error, setError] = useState<string | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [editingAppId, setEditingAppId] = useState<number | null>(null);
+    const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
     const today = new Date().toISOString().split("T")[0];
 
@@ -27,6 +32,50 @@ function App() {
     const [page, setPage] = useState(1);
     const pageSize = 10;
     const [totalCount, setTotalCount] = useState(0);
+
+    async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        try {
+            setError(null);
+
+            const result = await loginUser({
+                email,
+                password,
+            });
+
+            setToken(result.token);
+            localStorage.setItem("token", result.token);
+
+            setEmail("");
+            setPassword("");
+        } catch {
+            setError("Failed to log in");
+        }
+    }
+
+    async function handleDemoLogin() {
+        console.log("Demo clicked");
+        try {
+            setError(null);
+
+            const result = await loginUser({
+                email: "demo@tracker.com",
+                password: "Demo123!"
+            });
+
+            setToken(result.token);
+            localStorage.setItem("token", result.token);
+        } catch {
+            setError("Failed to log in with demo account");
+        }
+    }
+
+    function handleLogout() {
+        setToken(null);
+        localStorage.removeItem("token");
+        setApplications([]);
+    }
 
     async function loadApplications() {
         try {
@@ -58,6 +107,12 @@ function App() {
     }, [statusFilter, companyFilter]);
 
     useEffect(() => {
+        if (!token) {
+            setApplications([]);
+            setLoading(false);
+            return;
+        }
+
         async function fetchData() {
             try {
                 const result = await getApplications({
@@ -66,6 +121,7 @@ function App() {
                     page,
                     pageSize,
                 });
+
                 setApplications(result.items);
                 setTotalCount(result.totalCount);
             } catch {
@@ -76,7 +132,7 @@ function App() {
         }
 
         fetchData();
-    }, [statusFilter, companyFilter, page]);
+    }, [token, statusFilter, companyFilter, page]);
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -148,16 +204,79 @@ function App() {
         }
     }
 
+    if (!token) {
+        return (
+            <div className="app">
+                <div className="form-panel auth-panel">
+                    <h1 className="app-title">Application Tracker Login</h1>
+                    <p className="auth-subtitle">Sign in to view and manage your applications.</p>
+
+                    {error && <p className="error-text">{error}</p>}
+
+                    <form onSubmit={handleLogin}>
+                        <div className="form-grid">
+                            <div className="form-field full-width">
+                                <label htmlFor="email">Email</label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(event) => setEmail(event.target.value)}
+                                />
+                            </div>
+
+                            <div className="form-field full-width">
+                                <label htmlFor="password">Password</label>
+                                <input
+                                    id="password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(event) => setPassword(event.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-actions">
+                            <button className="primary-button" type="submit">
+                                Log In
+                            </button>
+
+                            <button
+                                className="secondary-button"
+                                type="button"
+                                onClick={handleDemoLogin}
+                            >
+                                Try Demo Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="app">
             <header className="app-header">
                 <h1 className="app-title">Job Applications</h1>
-                <button
-                    className="primary-button"
-                    onClick={() => setShowForm((current) => !current)}
-                >
-                    {showForm ? "Close Form" : "Create Application"}
-                </button>
+
+                <div className="header-actions">
+                    <button
+                        className="secondary-button"
+                        type="button"
+                        onClick={handleLogout}
+                    >
+                        Log Out
+                    </button>
+
+                    <button
+                        className="primary-button"
+                        type="button"
+                        onClick={() => setShowForm((current) => !current)}
+                    >
+                        {showForm ? "Close Form" : "Create Application"}
+                    </button>
+                </div>
             </header>
 
             {error && <p className="error-text">{error}</p>}
