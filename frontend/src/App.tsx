@@ -18,7 +18,6 @@ function App() {
     const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
     const today = new Date().toISOString().split("T")[0];
 
