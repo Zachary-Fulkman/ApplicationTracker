@@ -10,6 +10,29 @@ export interface Application {
 }
 
 /**
+ * Payload used when registering a new user.
+ */
+export interface RegisterUserRequest {
+    email: string;
+    password: string;
+}
+
+/**
+ * Payload used when logging in a user.
+ */
+export interface LoginUserRequest {
+    email: string;
+    password: string;
+}
+
+/**
+ * Response returned after a successful login.
+ */
+export interface LoginResponse {
+    token: string;
+}
+
+/**
  * Generic structure for paginated API responses.
  */
 export interface PagedResult<T> {
@@ -20,6 +43,21 @@ export interface PagedResult<T> {
 }
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+function getAuthHeaders(): HeadersInit {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        return {
+            "Content-Type": "application/json",
+        };
+    }
+
+    return {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+    };
+}
 
 /**
  * Query parameters used when fetching applications (filters + pagination).
@@ -55,7 +93,9 @@ export async function getApplications(
         url.searchParams.append("pageSize", params.pageSize.toString());
     }
 
-    const response = await fetch(url.toString());
+    const response = await fetch(url.toString(), {
+        headers: getAuthHeaders(),
+    });
 
     if (!response.ok) {
         throw new Error("Failed to fetch applications");
@@ -80,9 +120,7 @@ export interface CreateApplicationRequest {
 export async function createApplication(data: CreateApplicationRequest) {
     const response = await fetch(BASE_URL, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
     });
 
@@ -99,6 +137,7 @@ export async function createApplication(data: CreateApplicationRequest) {
 export async function deleteApplication(id: number) {
     const response = await fetch(`${BASE_URL}/${id}`, {
         method: "DELETE",
+        headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -125,6 +164,21 @@ export async function updateApplication(
 ) {
     const response = await fetch(`${BASE_URL}/${id}`, {
         method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to update application");
+    }
+}
+
+/**
+ * Sends a request to register a new user account.
+ */
+export async function registerUser(data: RegisterUserRequest) {
+    const response = await fetch(`${BASE_URL.replace("/application", "/auth")}/register`, {
+        method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
@@ -132,6 +186,27 @@ export async function updateApplication(
     });
 
     if (!response.ok) {
-        throw new Error("Failed to update application");
+        throw new Error("Failed to register user");
     }
+
+    return response.json();
+}
+
+/**
+ * Sends a request to log in a user and returns a JWT token.
+ */
+export async function loginUser(data: LoginUserRequest): Promise<LoginResponse> {
+    const response = await fetch(`${BASE_URL.replace("/application", "/auth")}/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to log in");
+    }
+
+    return response.json();
 }

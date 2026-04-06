@@ -41,18 +41,21 @@ namespace ApplicationTracker.Services
         }
 
         /// <summary>
-        /// Searches applications with optional filters and pagination.
+        /// Searches logged-in user's applications with optional filters and pagination.
         /// Only applies filters that are actually provided.
         /// </summary>
         public async Task<PagedResult<ApplicationModel>> Search(
-        string? status,
-        string? company,
-        DateOnly? fromDate,
-        DateOnly? toDate,
-        int page,
-        int pageSize)
+            string userId,
+            string? status,
+            string? company,
+            DateOnly? fromDate,
+            DateOnly? toDate,
+            int page,
+            int pageSize)
         {
-            var query = _db.Applications.AsQueryable();
+            var query = _db.Applications
+                .Where(a => a.UserId == userId)
+                .AsQueryable();
 
             // Guardrails for pagination so weird inputs don't break things.
             page = page < 1 ? 1 : page;
@@ -86,7 +89,10 @@ namespace ApplicationTracker.Services
             query = query.OrderByDescending(a => a.DateApplied);
 
             // Apply pagination at the database level.
-            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             // Return the results along with pagination info.
             return new PagedResult<ApplicationModel>
@@ -99,10 +105,10 @@ namespace ApplicationTracker.Services
         }
 
         /// <summary>
-        /// Retrieves a single application by Id.
+        /// Retrieves a single application by Id for the logged-in user.
         /// Returns null if not found.
         /// </summary>
-        public async Task<ApplicationModel?> GetById(int id)
+        public async Task<ApplicationModel?> GetById(int id, string userId)
         {
             return await _db.Applications.FirstOrDefaultAsync(a => a.Id == id);
         }
@@ -112,9 +118,11 @@ namespace ApplicationTracker.Services
         /// Returns true if the application was found and updated,
         /// false if no matching Id exists.
         /// </summary>
-        public async Task<bool> Update(int id, ApplicationModel updatedApplication)
+        public async Task<bool> Update(int id, ApplicationModel updatedApplication, string userId)
         {
-            var existing = await _db.Applications.FirstOrDefaultAsync(a => a.Id == id);
+            var existing = await _db.Applications
+                .FirstOrDefaultAsync(a => a.Id == id);
+            
             if (existing == null)
                 return false;
             
@@ -132,9 +140,11 @@ namespace ApplicationTracker.Services
         /// Returns true if deletion occurred,
         /// false if the Id was not found.
         /// </summary>
-        public async Task<bool> Delete(int id)
+        public async Task<bool> Delete(int id, string userId)
         {
-            var existing =  await _db.Applications.FirstOrDefaultAsync(a => a.Id == id);
+            var existing =  await _db.Applications
+                .FirstOrDefaultAsync(a => a.Id == id);
+            
             if (existing == null)
                 return false;
 
