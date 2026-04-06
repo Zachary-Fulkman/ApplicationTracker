@@ -43,6 +43,9 @@ export interface PagedResult<T> {
 }
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const AUTH_URL = BASE_URL.replace("/application", "/auth");
+console.log("BASE_URL:", BASE_URL);
+console.log("AUTH_URL:", AUTH_URL);
 
 function getAuthHeaders(): HeadersInit {
     const token = localStorage.getItem("token");
@@ -177,7 +180,7 @@ export async function updateApplication(
  * Sends a request to register a new user account.
  */
 export async function registerUser(data: RegisterUserRequest) {
-    const response = await fetch(`${BASE_URL.replace("/application", "/auth")}/register`, {
+    const response = await fetch(`${AUTH_URL}/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -196,7 +199,7 @@ export async function registerUser(data: RegisterUserRequest) {
  * Sends a request to log in a user and returns a JWT token.
  */
 export async function loginUser(data: LoginUserRequest): Promise<LoginResponse> {
-    const response = await fetch(`${BASE_URL.replace("/application", "/auth")}/login`, {
+    const response = await fetch(`${AUTH_URL}/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -205,7 +208,8 @@ export async function loginUser(data: LoginUserRequest): Promise<LoginResponse> 
     });
 
     if (!response.ok) {
-        throw new Error("Failed to log in");
+        const errorText = await response.text();
+        throw new Error(`Failed to log in: ${response.status} ${errorText}`);
     }
 
     return response.json();
