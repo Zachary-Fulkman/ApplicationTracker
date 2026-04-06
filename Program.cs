@@ -2,6 +2,7 @@ using System.Text;
 using ApplicationTracker.Data;
 using ApplicationTracker.Models;
 using ApplicationTracker.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -89,6 +90,15 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
+
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.PostConfigure<AuthenticationOptions>(options =>
+    {
+        options.DefaultAuthenticateScheme = "Test";
+        options.DefaultChallengeScheme = "Test";
+    });
+}
 
 builder.Services.AddCors(options =>
 {
