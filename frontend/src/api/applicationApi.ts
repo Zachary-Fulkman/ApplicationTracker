@@ -43,7 +43,7 @@ export interface PagedResult<T> {
 }
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const AUTH_URL = BASE_URL.replace("/application", "/auth");
+const AUTH_URL = "https://applicationtracker-papa.onrender.com/api/auth";
 console.log("BASE_URL:", BASE_URL);
 console.log("AUTH_URL:", AUTH_URL);
 
