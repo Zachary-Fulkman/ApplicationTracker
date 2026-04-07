@@ -139,7 +139,8 @@ if (!app.Environment.IsEnvironment("Testing"))
 
         if (!result.Succeeded)
         {
-            throw new Exception("Failed to create demo user.");
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new Exception($"Failed to create demo user: {errors}");
         }
     }
 }
@@ -149,7 +150,10 @@ app.UseSwagger();
     app.UseSwaggerUI();
 
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowFrontend");
 
